@@ -81,6 +81,14 @@ func nicComputedVMFields() map[string]*schema.Schema {
 			Type:     schema.TypeString,
 			Computed: true,
 		},
+		"computed_ip6_global": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
+		"computed_ip6_link": {
+			Type:     schema.TypeString,
+			Computed: true,
+		},
 		"computed_mac": {
 			Type:     schema.TypeString,
 			Computed: true,
@@ -889,6 +897,12 @@ func flattenVMNICComputed(NICConfig map[string]interface{}, NIC shared.NIC) map[
 
 	if len(NICConfig["ip"].(string)) > 0 {
 		NICMap["ip"] = NICMap["computed_ip"]
+	}
+	if len(NICConfig["ip6_global"].(string)) > 0 {
+		NICMap["ip6_global"] = NICMap["computed_ip6_global"]
+	}
+	if len(NICConfig["ip6_link"].(string)) > 0 {
+		NICMap["ip6_link"] = NICMap["computed_ip6_link"]
 	}
 	if len(NICConfig["mac"].(string)) > 0 {
 		NICMap["mac"] = NICMap["computed_mac"]
