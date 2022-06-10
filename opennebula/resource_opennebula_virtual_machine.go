@@ -899,6 +899,8 @@ func resourceOpennebulaVirtualMachineUpdate(d *schema.ResourceData, meta interfa
 }
 
 func customVirtualMachineUpdate(d *schema.ResourceData, meta interface{}) error {
+	// zuntrax
+	log.Printf("[INFO] In customVirtualMachineUpdate")
 
 	var err error
 
@@ -1044,6 +1046,9 @@ func resourceOpennebulaVirtualMachineUpdateCustom(d *schema.ResourceData, meta i
 			return err
 		}
 	}
+
+	// zuntrax
+	log.Printf("[INFO] Do we need to update NIC config: %v", d.HasChange("nic"))
 
 	if customFunc != nil {
 		err = customFunc(d, meta)
