@@ -1,9 +1,6 @@
-# Visit https://goreleaser.com for documentation on how to customize this
-# behavior.
 before:
   hooks:
-    # this is just an example and not a requirement for provider building/publishing
-    - go mod tidy
+    - rm -rf dist
 builds:
   - env:
       # goreleaser does not work with CGO, it could also complicate
@@ -16,24 +13,17 @@ builds:
     ldflags:
       - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}"
     goos:
-      - freebsd
-      - windows
       - linux
       - darwin
     goarch:
       - amd64
-      - "386"
-      - arm
       - arm64
-    ignore:
-      - goos: darwin
-        goarch: "386"
-    binary: "{{ .ProjectName }}_v{{ .Version }}"
+    binary: "{{ .ProjectName }}-ipv6_v{{ .Version }}"
 archives:
   - format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}-ipv6_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 checksum:
-  name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
+  name_template: "{{ .ProjectName }}-ipv6_{{ .Version }}_SHA256SUMS"
   algorithm: sha256
 signs:
   - artifacts: checksum
@@ -48,6 +38,17 @@ signs:
       - "--detach-sign"
       - "${artifact}"
 release:
-  prerelease: auto
+  disable: true
+publishers:
+  - name: copy binaries to registry directory
+    checksum: true
+    signature: true
+    cmd: cp {{ .ArtifactPath }} registry-binaries
+  - name: build registry api files
+    ids: [""]
+    checksum: true
+    cmd: tf-provider-registry-api-generator --url https://tf-registry.infra.run/binaries --namespace opennebula --provider-release-dir ./dist/
+    env:
+      - GPG_FINGERPRINT={{ .Env.GPG_FINGERPRINT }}
 changelog:
   skip: true
