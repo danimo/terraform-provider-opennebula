@@ -1358,7 +1358,7 @@ func resourceOpennebulaVirtualMachineUpdateCustom(ctx context.Context, d *schema
 
 	// retrieve only template sections managed by updateconf method
 	tpl = vm.NewTemplate()
-	for _, name := range []string{"OS", "FEATURES", "INPUT", "GRAPHICS", "RAW", "CONTEXT"} {
+	for _, name := range []string{"OS", "FEATURES", "INPUT", "GRAPHICS", "RAW", "CONTEXT", "CPU_MODEL"} {
 		vectors := vmInfos.Template.GetVectors(name)
 		for _, vec := range vectors {
 			tpl.Elements = append(tpl.Elements, vec)
@@ -1485,6 +1485,18 @@ func resourceOpennebulaVirtualMachineUpdateCustom(ctx context.Context, d *schema
 
 	if d.HasChange("raw") {
 		updateRaw(d, &tpl.Template)
+		updateConf = true
+	}
+
+	if d.HasChange("cpumodel") {
+		tpl.Del("CPU_MODEL")
+		cpumodel := d.Get("cpumodel").([]interface{})
+
+		for i := 0; i < len(cpumodel); i++ {
+			cpumodelConfig := cpumodel[i].(map[string]interface{})
+			tpl.CPUModel(cpumodelConfig["model"].(string))
+		}
+
 		updateConf = true
 	}
 
